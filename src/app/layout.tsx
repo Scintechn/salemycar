@@ -12,7 +12,7 @@ const geistSans = Geist({
 export const metadata: Metadata = {
   title: "SaleMyCar — Renault Clio V 2022",
   description:
-    "Renault Clio V 2022 vendido pelo proprietário. Sem comissões, sem intermediários.",
+    "Renault Clio V 2022 — anúncio particular, gerido diretamente pelo proprietário. Sem intermediários a inflar o preço.",
 };
 
 export default function RootLayout({

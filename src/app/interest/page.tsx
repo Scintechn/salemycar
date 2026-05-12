@@ -39,7 +39,7 @@ export default async function InterestPage() {
         </h1>
         <p className="mt-2 text-sm text-zinc-600">
           Deixe os seus dados. O proprietário entra em contacto por WhatsApp no
-          próprio dia. Os seus dados são usados apenas para esta venda.
+          próprio dia. Os seus dados são usados apenas para responder ao seu pedido.
         </p>
 
         {referrerName ? (

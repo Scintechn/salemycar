@@ -20,7 +20,7 @@ function statusLabel(status: Lead["status"]): string {
     case "test_drive":
       return "Test drive";
     case "closed_won":
-      return "Venda fechada";
+      return "Trato fechado";
     case "closed_lost":
       return "Não fechou";
   }
@@ -104,9 +104,9 @@ export default async function AffiliateDashboardPage({ params }: Props) {
           Olá, {firstName}
         </h1>
         <p className="mt-2 text-sm text-zinc-600">
-          Comissão máxima por venda fechada:{" "}
+          Bónus máximo por trato fechado:{" "}
           <strong>{formatEUR(listing.affiliate_commission)}</strong>{" "}
-          (proporcional ao preço final de venda).
+          (proporcional ao preço final do trato).
         </p>
 
         {/* Referral URL */}
@@ -125,8 +125,8 @@ export default async function AffiliateDashboardPage({ params }: Props) {
             label="Em conversa"
             value={counts.contacted + counts.test_drive}
           />
-          <Stat label="Vendas fechadas" value={counts.closed_won} />
-          <Stat label="Comissão" value={formatEUR(earnedTotal)} />
+          <Stat label="Tratos fechados" value={counts.closed_won} />
+          <Stat label="Bónus" value={formatEUR(earnedTotal)} />
         </section>
 
         {/* Leads list */}
@@ -190,9 +190,9 @@ export default async function AffiliateDashboardPage({ params }: Props) {
         </section>
 
         <p className="mt-6 text-xs text-zinc-500">
-          Pagamento por MB Way ou transferência após a escritura. A comissão
-          escala proporcionalmente ao preço final de venda (regra de 3) e está
-          limitada ao máximo configurado.
+          Pagamento por MB Way ou transferência após a escritura. O bónus
+          escala proporcionalmente ao preço final do trato (regra de 3) e está
+          limitado ao máximo configurado.
         </p>
       </div>
     </main>

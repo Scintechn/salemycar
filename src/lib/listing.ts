@@ -32,7 +32,7 @@ const FALLBACK: Listing = {
   transmission: "Manual",
   power: "75 cv",
   color: "Cinzento Titânio",
-  description: "Particular. Sem comissões. Sem intermediários a inflar o preço.",
+  description: "Particular. Sem intermediários a inflar o preço.",
   options: [
     "Ar condicionado automático",
     "Sensores de estacionamento traseiros",

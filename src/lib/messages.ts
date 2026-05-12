@@ -59,7 +59,7 @@ export function affiliateWelcome(opts: {
   return (
     `Olá ${firstName}! 🎉 Já é afiliado SaleMyCar.\n\n` +
     `*O seu link para partilhar:*\n${opts.refUrl}\n\n` +
-    `Por cada venda fechada a partir deste link recebe até *${formatEUR(opts.maxCommission)}* (proporcional ao preço final).\n\n` +
+    `Por cada trato fechado a partir deste link recebe até *${formatEUR(opts.maxCommission)}* (proporcional ao preço final).\n\n` +
     `Acompanhe os seus leads aqui:\n${opts.dashboardUrl}\n\n` +
     `Pagamento por MB Way ou transferência após escritura. Boa partilha!`
   );
@@ -87,7 +87,7 @@ export function affiliateWelcomeRich(opts: {
     description:
       `Já é afiliado SaleMyCar.\n\n` +
       `O seu link para partilhar:\n${opts.refUrl}\n\n` +
-      `Por cada venda fechada a partir deste link recebe até ${formatEUR(opts.maxCommission)} (proporcional ao preço final). Pagamento por MB Way ou transferência após escritura.`,
+      `Por cada trato fechado a partir deste link recebe até ${formatEUR(opts.maxCommission)} (proporcional ao preço final). Pagamento por MB Way ou transferência após escritura.`,
     footer: "SaleMyCar — programa de afiliados",
     buttons: [
       { type: "copy", displayText: "Copiar o meu link", copyCode: opts.refUrl },

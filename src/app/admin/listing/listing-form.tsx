@@ -74,7 +74,7 @@ export function ListingForm({ listing, envDefaults }: Props) {
 
       {/* Pricing */}
       <div>
-        <h2 className="text-lg font-semibold">Preço e comissão</h2>
+        <h2 className="text-lg font-semibold">Preço e bónus</h2>
         <p className="mt-1 text-xs text-zinc-500">
           Em branco usa o valor configurado em ambiente (predefinido). O valor
           aqui sobrepõe-se aos env vars.
@@ -99,7 +99,7 @@ export function ListingForm({ listing, envDefaults }: Props) {
           />
           <Field
             name="affiliate_commission"
-            label="Comissão afiliado (€)"
+            label="Bónus afiliado (€)"
             type="number"
             placeholder={`pred. ${envDefaults.affiliate_commission}`}
             defaultValue={overrideValue(

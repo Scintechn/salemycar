@@ -22,11 +22,11 @@ export default async function AffiliateSignupPage() {
         </Link>
 
         <h1 className="mt-4 text-2xl font-semibold tracking-tight md:text-3xl">
-          Recomende e ganhe comissão
+          Recomende e receba um bónus
         </h1>
         <p className="mt-2 text-base text-zinc-600">
           Tem alguém à procura de um carro? Inscreva-se e receba um link
-          próprio. Por cada venda fechada a partir do seu link, recebe até{" "}
+          próprio. Por cada trato fechado a partir do seu link, recebe até{" "}
           <strong>{formatEUR(maxComm)}</strong>.
         </p>
 
@@ -48,8 +48,8 @@ export default async function AffiliateSignupPage() {
             />
             <Step
               n={3}
-              title="Receba comissão"
-              body={`Até ${formatEUR(maxComm)} por venda fechada. Pagamento por MB Way ou transferência após escritura.`}
+              title="Receba o seu bónus"
+              body={`Até ${formatEUR(maxComm)} por trato fechado. Pagamento por MB Way ou transferência após escritura.`}
             />
           </ol>
         </section>
@@ -57,19 +57,19 @@ export default async function AffiliateSignupPage() {
         {/* ----- COMMISSION RULES ----- */}
         <section className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-emerald-900">
-            Como é calculada a comissão
+            Como é calculado o bónus
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-emerald-900">
-            A comissão máxima é <strong>{formatEUR(maxComm)}</strong>, aplicada
-            em vendas a <strong>{formatEUR(refPrice)}</strong> (preço de tabela
-            de {formatEUR(listing.list_price)} menos o desconto de{" "}
+            O bónus máximo é <strong>{formatEUR(maxComm)}</strong>, aplicado em
+            tratos a <strong>{formatEUR(refPrice)}</strong> (preço de tabela de{" "}
+            {formatEUR(listing.list_price)} menos o desconto de{" "}
             {formatEUR(listing.buyer_discount)} aplicado pelo código).
           </p>
           <p className="mt-2 text-sm leading-relaxed text-emerald-900">
-            Se houver negociação e o carro for vendido por um valor inferior, a
-            comissão escala proporcionalmente (regra de 3). Exemplo: se o carro
-            for vendido por {formatEUR(Math.round(refPrice * 0.97))}, a comissão
-            é de {formatEUR(Math.round(maxComm * 0.97))}.
+            Se houver negociação e o trato fechar por um valor inferior, o
+            bónus escala proporcionalmente (regra de 3). Exemplo: se o trato
+            fechar a {formatEUR(Math.round(refPrice * 0.97))}, o bónus é de{" "}
+            {formatEUR(Math.round(maxComm * 0.97))}.
           </p>
         </section>
 
@@ -85,10 +85,10 @@ export default async function AffiliateSignupPage() {
         </div>
 
         <p className="mt-6 text-xs text-zinc-500">
-          Comissão paga pelo proprietário, sem qualquer custo para o comprador.
+          Bónus pago pelo proprietário, sem qualquer custo para o comprador.
           Anúncio particular — para informações sobre fiscalidade dos
-          recebimentos como afiliado, consulte o proprietário antes da primeira
-          venda fechada.
+          recebimentos como afiliado, consulte o proprietário antes do primeiro
+          trato fechado.
         </p>
       </div>
     </main>

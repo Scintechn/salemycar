@@ -38,8 +38,8 @@ export default function SellPage() {
             />
             <Step
               n={3}
-              title="Você fecha a venda"
-              body="Fala diretamente com o comprador. Paga uma comissão fixa só por venda fechada."
+              title="Você fecha o trato"
+              body="Fala diretamente com o comprador. Paga um bónus fixo só por trato fechado."
             />
           </ol>
         </section>

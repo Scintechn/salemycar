@@ -10,7 +10,7 @@ const STATUS_OPTIONS: { value: LeadStatus; label: string }[] = [
   { value: "new", label: "Novo" },
   { value: "contacted", label: "Contactado" },
   { value: "test_drive", label: "Test drive" },
-  { value: "closed_won", label: "Venda fechada" },
+  { value: "closed_won", label: "Trato fechado" },
   { value: "closed_lost", label: "Não fechou" },
 ];
 
@@ -107,7 +107,7 @@ export function LeadRow({
               <a
                 className="mt-0.5 inline-block text-emerald-700 underline"
                 href={`https://wa.me/${affiliateWhatsapp}?text=${encodeURIComponent(
-                  `Olá ${affiliateName.split(" ")[0]}, vou enviar-te ${formatEUR(commission)} pela venda fechada do Clio.`,
+                  `Olá ${affiliateName.split(" ")[0]}, vou enviar-te ${formatEUR(commission)} pelo trato fechado do Clio.`,
                 )}`}
                 target="_blank"
                 rel="noopener"
@@ -155,7 +155,7 @@ export function LeadRow({
             </div>
             {commission != null ? (
               <span className="text-[10px] text-zinc-500">
-                comissão {formatEUR(commission)}
+                bónus {formatEUR(commission)}
               </span>
             ) : null}
           </div>

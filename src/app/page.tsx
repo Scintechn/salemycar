@@ -195,7 +195,7 @@ export default async function HomePage() {
       {/* ----- FOOTER -------------------------------------------------- */}
       <footer className="border-t border-zinc-200 bg-white">
         <div className="mx-auto max-w-6xl px-6 py-6 text-center text-xs text-zinc-500">
-          Anúncio particular. Não há comissão para o comprador.{" "}
+          Anúncio particular. Sem custos extra para o comprador.{" "}
           <Link href="/affiliate" className="underline hover:text-zinc-700">
             Seja Afiliado
           </Link>

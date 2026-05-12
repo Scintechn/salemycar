@@ -111,11 +111,11 @@ export default async function AdminPage() {
           </Link>
         </nav>
 
-        {/* Commission rule reminder */}
+        {/* Bonus rule reminder */}
         <p className="mt-4 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs text-zinc-600">
-          Comissão máxima: <strong>{formatEUR(listing.affiliate_commission)}</strong>{" "}
-          em vendas a <strong>{formatEUR(refPrice)}</strong> (preço de tabela
-          menos desconto). Em negociações abaixo desse valor, a comissão escala
+          Bónus máximo: <strong>{formatEUR(listing.affiliate_commission)}</strong>{" "}
+          em tratos a <strong>{formatEUR(refPrice)}</strong> (preço de tabela
+          menos desconto). Em negociações abaixo desse valor, o bónus escala
           proporcionalmente (regra de 3).
         </p>
 
@@ -132,7 +132,7 @@ export default async function AdminPage() {
                   <th className="px-4 py-3">Código</th>
                   <th className="px-4 py-3">Afiliado</th>
                   <th className="px-4 py-3">Estado</th>
-                  <th className="px-4 py-3">Preço venda</th>
+                  <th className="px-4 py-3">Preço final</th>
                   <th className="px-4 py-3">Notas</th>
                   <th className="px-4 py-3">Pago</th>
                 </tr>
@@ -181,7 +181,7 @@ export default async function AdminPage() {
                   <th className="px-4 py-3">WhatsApp</th>
                   <th className="px-4 py-3 text-right">Leads</th>
                   <th className="px-4 py-3 text-right">Fechadas</th>
-                  <th className="px-4 py-3 text-right">Comissão devida</th>
+                  <th className="px-4 py-3 text-right">Bónus devido</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
@@ -217,7 +217,7 @@ export default async function AdminPage() {
                             <a
                               className="font-semibold text-emerald-700 underline"
                               href={`https://wa.me/${aff.whatsapp}?text=${encodeURIComponent(
-                                `Olá ${aff.name.split(" ")[0]}, vou enviar-te ${formatEUR(agg.owed)} pela(s) venda(s) fechada(s) do Clio.`,
+                                `Olá ${aff.name.split(" ")[0]}, vou enviar-te ${formatEUR(agg.owed)} pelo(s) trato(s) fechado(s) do Clio.`,
                               )}`}
                               target="_blank"
                               rel="noopener"

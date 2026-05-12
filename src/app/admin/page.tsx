@@ -89,12 +89,18 @@ export default async function AdminPage() {
           </div>
         </header>
 
-        <nav className="mt-6 flex gap-3 text-sm">
+        <nav className="mt-6 flex flex-wrap gap-3 text-sm">
           <Link
             href="/admin/listing"
             className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 font-medium text-zinc-800 hover:bg-zinc-50"
           >
             Editar anúncio →
+          </Link>
+          <Link
+            href="/admin/whatsapp-test"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-zinc-600 hover:bg-zinc-50"
+          >
+            Testar WhatsApp
           </Link>
           <Link
             href="/"

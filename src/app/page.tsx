@@ -74,18 +74,20 @@ export default async function HomePage() {
             {/* Price + CTA */}
             <div className="mt-8 rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="text-3xl font-bold tracking-tight md:text-4xl">
-                  {formatEUR(car.list_price)}
+                <span className="text-3xl font-bold tracking-tight text-emerald-700 md:text-4xl">
+                  {formatEUR(finalPrice)}
                 </span>
-                <span className="text-xs uppercase tracking-wide text-zinc-500">
-                  preço de tabela
+                <span className="text-xs uppercase tracking-wide text-emerald-700">
+                  com código
                 </span>
               </div>
-              <p className="mt-1 text-sm text-emerald-700">
-                Com código de desconto:{" "}
-                <strong>{formatEUR(finalPrice)}</strong>
+              <p className="mt-1 text-sm text-zinc-600">
+                Sem código:{" "}
+                <span className="font-medium text-zinc-800">
+                  {formatEUR(car.list_price)}
+                </span>
                 <span className="ml-1 text-zinc-500">
-                  (poupa {formatEUR(car.buyer_discount)})
+                  (poupa {formatEUR(car.buyer_discount)} com código)
                 </span>
               </p>
               <Link href="/interest" className="mt-4 block">

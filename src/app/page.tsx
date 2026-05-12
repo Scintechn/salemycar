@@ -193,7 +193,7 @@ export default async function HomePage() {
         <div className="mx-auto max-w-6xl px-6 py-6 text-center text-xs text-zinc-500">
           Anúncio particular. Não há comissão para o comprador.{" "}
           <Link href="/affiliate" className="underline hover:text-zinc-700">
-            Sou afiliado
+            Seja Afiliado
           </Link>
         </div>
       </footer>

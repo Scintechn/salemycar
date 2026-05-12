@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { supabaseAdmin, type Affiliate, type Lead } from "@/lib/supabase";
-import { formatEUR, pricing } from "@/lib/config";
+import { formatEUR } from "@/lib/config";
 import { getListing } from "@/lib/listing";
+import { referencePrice } from "@/lib/commission";
 import { LeadRow } from "./lead-row";
 
 export const dynamic = "force-dynamic";
@@ -11,12 +12,16 @@ type AffiliateLite = Pick<Affiliate, "id" | "name" | "ref_code" | "whatsapp">;
 export default async function AdminPage() {
   const db = supabaseAdmin();
   const listing = await getListing();
+  const refPrice = referencePrice({
+    listPrice: listing.list_price,
+    buyerDiscount: listing.buyer_discount,
+  });
 
   const [{ data: leadsRaw }, { data: affiliatesRaw }] = await Promise.all([
     db
       .from("leads")
       .select(
-        "id, affiliate_id, buyer_name, buyer_whatsapp, discount_code, status, notes, commission_paid, created_at, updated_at",
+        "id, affiliate_id, buyer_name, buyer_whatsapp, discount_code, status, notes, commission_paid, sale_price, commission_amount, created_at, updated_at",
       )
       .order("created_at", { ascending: false }),
     db
@@ -29,22 +34,26 @@ export default async function AdminPage() {
   const affiliates = (affiliatesRaw ?? []) as AffiliateLite[];
   const affiliateById = new Map(affiliates.map((a) => [a.id, a]));
 
-  // Aggregate per-affiliate counts.
+  // Per-affiliate aggregation. Commission is summed from the snapshotted
+  // commission_amount on each closed_won lead so historical rate changes
+  // don't retroactively rewrite payouts.
   const aggregate = new Map<
     string,
-    { leads: number; won: number; paidWon: number }
+    { leads: number; won: number; owed: number }
   >();
   for (const lead of leads) {
     if (!lead.affiliate_id) continue;
     const cur = aggregate.get(lead.affiliate_id) ?? {
       leads: 0,
       won: 0,
-      paidWon: 0,
+      owed: 0,
     };
     cur.leads += 1;
     if (lead.status === "closed_won") {
       cur.won += 1;
-      if (lead.commission_paid) cur.paidWon += 1;
+      if (!lead.commission_paid) {
+        cur.owed += lead.commission_amount ?? listing.affiliate_commission;
+      }
     }
     aggregate.set(lead.affiliate_id, cur);
   }
@@ -52,8 +61,14 @@ export default async function AdminPage() {
   const totalLeads = leads.length;
   const totalWon = leads.filter((l) => l.status === "closed_won").length;
   const totalOwed = leads
-    .filter((l) => l.status === "closed_won" && !l.commission_paid && l.affiliate_id)
-    .length * pricing.affiliateCommission;
+    .filter(
+      (l) =>
+        l.status === "closed_won" && !l.commission_paid && l.affiliate_id,
+    )
+    .reduce(
+      (sum, l) => sum + (l.commission_amount ?? listing.affiliate_commission),
+      0,
+    );
 
   return (
     <main className="flex-1">
@@ -90,11 +105,19 @@ export default async function AdminPage() {
           </Link>
         </nav>
 
+        {/* Commission rule reminder */}
+        <p className="mt-4 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs text-zinc-600">
+          Comissão máxima: <strong>{formatEUR(listing.affiliate_commission)}</strong>{" "}
+          em vendas a <strong>{formatEUR(refPrice)}</strong> (preço de tabela
+          menos desconto). Em negociações abaixo desse valor, a comissão escala
+          proporcionalmente (regra de 3).
+        </p>
+
         {/* Leads */}
         <section className="mt-10">
           <h2 className="text-lg font-semibold">Leads</h2>
-          <div className="mt-4 overflow-hidden rounded-2xl border border-zinc-200 bg-white">
-            <table className="w-full text-left text-sm">
+          <div className="mt-4 overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
+            <table className="w-full min-w-[860px] text-left text-sm">
               <thead className="bg-zinc-50 text-xs uppercase tracking-wide text-zinc-500">
                 <tr>
                   <th className="px-4 py-3">Data</th>
@@ -103,6 +126,7 @@ export default async function AdminPage() {
                   <th className="px-4 py-3">Código</th>
                   <th className="px-4 py-3">Afiliado</th>
                   <th className="px-4 py-3">Estado</th>
+                  <th className="px-4 py-3">Preço venda</th>
                   <th className="px-4 py-3">Notas</th>
                   <th className="px-4 py-3">Pago</th>
                 </tr>
@@ -111,7 +135,7 @@ export default async function AdminPage() {
                 {leads.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={8}
+                      colSpan={9}
                       className="px-4 py-8 text-center text-zinc-500"
                     >
                       Ainda não há leads.
@@ -128,6 +152,8 @@ export default async function AdminPage() {
                         lead={lead}
                         affiliateName={aff?.name ?? null}
                         affiliateWhatsapp={aff?.whatsapp ?? null}
+                        referencePrice={refPrice}
+                        maxCommission={listing.affiliate_commission}
                       />
                     );
                   })
@@ -167,10 +193,8 @@ export default async function AdminPage() {
                     const agg = aggregate.get(aff.id) ?? {
                       leads: 0,
                       won: 0,
-                      paidWon: 0,
+                      owed: 0,
                     };
-                    const owedUnits = agg.won - agg.paidWon;
-                    const owed = owedUnits * pricing.affiliateCommission;
                     return (
                       <tr key={aff.id}>
                         <td className="px-4 py-3 font-medium">{aff.name}</td>
@@ -183,16 +207,16 @@ export default async function AdminPage() {
                         <td className="px-4 py-3 text-right">{agg.leads}</td>
                         <td className="px-4 py-3 text-right">{agg.won}</td>
                         <td className="px-4 py-3 text-right">
-                          {owed > 0 ? (
+                          {agg.owed > 0 ? (
                             <a
                               className="font-semibold text-emerald-700 underline"
                               href={`https://wa.me/${aff.whatsapp}?text=${encodeURIComponent(
-                                `Olá ${aff.name.split(" ")[0]}, vou enviar-te ${formatEUR(owed)} pela(s) venda(s) fechada(s) do Clio.`,
+                                `Olá ${aff.name.split(" ")[0]}, vou enviar-te ${formatEUR(agg.owed)} pela(s) venda(s) fechada(s) do Clio.`,
                               )}`}
                               target="_blank"
                               rel="noopener"
                             >
-                              {formatEUR(owed)}
+                              {formatEUR(agg.owed)}
                             </a>
                           ) : (
                             <span className="text-zinc-400">—</span>

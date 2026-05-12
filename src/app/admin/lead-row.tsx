@@ -3,7 +3,8 @@
 import { useState, useTransition } from "react";
 import type { Lead, LeadStatus } from "@/lib/supabase";
 import { updateLead } from "./actions";
-import { formatEUR, pricing } from "@/lib/config";
+import { formatEUR } from "@/lib/config";
+import { computeCommission } from "@/lib/commission";
 
 const STATUS_OPTIONS: { value: LeadStatus; label: string }[] = [
   { value: "new", label: "Novo" },
@@ -17,12 +18,26 @@ interface Props {
   lead: Lead;
   affiliateName: string | null;
   affiliateWhatsapp: string | null;
+  referencePrice: number;
+  maxCommission: number;
 }
 
-export function LeadRow({ lead, affiliateName, affiliateWhatsapp }: Props) {
+export function LeadRow({
+  lead,
+  affiliateName,
+  affiliateWhatsapp,
+  referencePrice,
+  maxCommission,
+}: Props) {
   const [status, setStatus] = useState<LeadStatus>(lead.status);
   const [notes, setNotes] = useState(lead.notes ?? "");
   const [paid, setPaid] = useState(lead.commission_paid);
+  const [salePriceText, setSalePriceText] = useState(
+    lead.sale_price != null ? String(lead.sale_price) : "",
+  );
+  const [commission, setCommission] = useState<number | null>(
+    lead.commission_amount,
+  );
   const [pending, startTransition] = useTransition();
   const [savedAt, setSavedAt] = useState<number | null>(null);
 
@@ -42,6 +57,25 @@ export function LeadRow({ lead, affiliateName, affiliateWhatsapp }: Props) {
     day: "2-digit",
     month: "2-digit",
   });
+
+  const isClosed = status === "closed_won";
+
+  function onSalePriceBlur() {
+    if (!isClosed) return;
+    const parsed = salePriceText === "" ? null : Number(salePriceText);
+    if (parsed !== null && !Number.isFinite(parsed)) return;
+    if (parsed === lead.sale_price) return;
+    const next =
+      parsed === null
+        ? null
+        : computeCommission({
+            salePrice: parsed,
+            reference: referencePrice,
+            maxCommission,
+          });
+    setCommission(next);
+    save({ id: lead.id, sale_price: parsed, commission_amount: next });
+  }
 
   return (
     <tr className={pending ? "opacity-60" : ""}>
@@ -68,17 +102,17 @@ export function LeadRow({ lead, affiliateName, affiliateWhatsapp }: Props) {
       <td className="px-4 py-3 text-xs">
         {affiliateName ? (
           <div>
-            <p>{affiliateName}</p>
-            {status === "closed_won" && !paid && affiliateWhatsapp ? (
+            <p className="font-medium">{affiliateName}</p>
+            {isClosed && commission != null && !paid && affiliateWhatsapp ? (
               <a
-                className="text-emerald-700 underline"
+                className="mt-0.5 inline-block text-emerald-700 underline"
                 href={`https://wa.me/${affiliateWhatsapp}?text=${encodeURIComponent(
-                  `Olá ${affiliateName.split(" ")[0]}, vou enviar-te ${formatEUR(pricing.affiliateCommission)} pela venda fechada do Clio.`,
+                  `Olá ${affiliateName.split(" ")[0]}, vou enviar-te ${formatEUR(commission)} pela venda fechada do Clio.`,
                 )}`}
                 target="_blank"
                 rel="noopener"
               >
-                Pagar {formatEUR(pricing.affiliateCommission)}
+                Pagar {formatEUR(commission)}
               </a>
             ) : null}
           </div>
@@ -104,6 +138,32 @@ export function LeadRow({ lead, affiliateName, affiliateWhatsapp }: Props) {
         </select>
       </td>
       <td className="px-4 py-3">
+        {isClosed ? (
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-zinc-500">€</span>
+              <input
+                type="number"
+                inputMode="numeric"
+                min={0}
+                value={salePriceText}
+                onChange={(e) => setSalePriceText(e.target.value)}
+                onBlur={onSalePriceBlur}
+                placeholder={String(referencePrice)}
+                className="w-24 rounded-md border border-zinc-300 bg-white px-1.5 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-zinc-900"
+              />
+            </div>
+            {commission != null ? (
+              <span className="text-[10px] text-zinc-500">
+                comissão {formatEUR(commission)}
+              </span>
+            ) : null}
+          </div>
+        ) : (
+          <span className="text-xs text-zinc-300">—</span>
+        )}
+      </td>
+      <td className="px-4 py-3">
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
@@ -121,7 +181,7 @@ export function LeadRow({ lead, affiliateName, affiliateWhatsapp }: Props) {
         <input
           type="checkbox"
           checked={paid}
-          disabled={status !== "closed_won"}
+          disabled={!isClosed}
           onChange={(e) => {
             const next = e.target.checked;
             setPaid(next);

@@ -56,6 +56,8 @@ export interface Lead {
   status: LeadStatus;
   notes: string | null;
   commission_paid: boolean;
+  sale_price: number | null;
+  commission_amount: number | null;
   created_at: string;
   updated_at: string;
 }

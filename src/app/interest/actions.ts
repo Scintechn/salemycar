@@ -8,6 +8,7 @@ import { generateDiscountCode, normalizePtWhatsapp } from "@/lib/codes";
 import { tryWhatsApp } from "@/lib/whatsapp";
 import { buyerConfirmation, ownerNewLead } from "@/lib/messages";
 import { owner } from "@/lib/config";
+import { getListing } from "@/lib/listing";
 
 const Schema = z.object({
   buyer_name: z
@@ -106,16 +107,23 @@ export async function submitInterest(
     };
   }
 
-  // 4. Fire WhatsApp messages (best-effort, never blocks)
+  // 4. Fire WhatsApp messages (best-effort, never blocks). Pull live pricing
+  // + title from the listing row so messages reflect /admin/listing edits.
+  const listing = await getListing();
   const buyerMsg = buyerConfirmation({
     buyerName: parsed.data.buyer_name,
     code: inserted.discount_code,
+    listPrice: listing.list_price,
+    buyerDiscount: listing.buyer_discount,
+    carTitle: `${listing.title} ${listing.year}`,
   });
   const ownerMsg = ownerNewLead({
     buyerName: parsed.data.buyer_name,
     buyerWhatsapp: normalizedPhone,
     code: inserted.discount_code,
     affiliateName: affiliate?.name ?? null,
+    listPrice: listing.list_price,
+    buyerDiscount: listing.buyer_discount,
   });
   await Promise.all([
     tryWhatsApp(normalizedPhone, buyerMsg),

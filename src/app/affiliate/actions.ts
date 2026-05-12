@@ -4,6 +4,14 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase";
 import { generateRefCode, normalizePtWhatsapp } from "@/lib/codes";
+import { tryWhatsApp, tryWhatsAppButtons } from "@/lib/whatsapp";
+import {
+  affiliateWelcome,
+  affiliateWelcomeRich,
+  ownerNewAffiliate,
+} from "@/lib/messages";
+import { owner, site } from "@/lib/config";
+import { getListing } from "@/lib/listing";
 
 const Schema = z.object({
   name: z.string().trim().min(2, "Indique o seu nome.").max(120),
@@ -53,6 +61,7 @@ export async function submitAffiliate(
     };
   }
 
+  const email = parsed.data.email.toLowerCase();
   const db = supabaseAdmin();
 
   let refCode = "";
@@ -64,7 +73,7 @@ export async function submitAffiliate(
       .from("affiliates")
       .insert({
         name: parsed.data.name,
-        email: parsed.data.email.toLowerCase(),
+        email,
         whatsapp: phone,
         ref_code: refCode,
       })
@@ -85,6 +94,35 @@ export async function submitAffiliate(
       errors: { form: "Não foi possível criar o seu link. Tente novamente." },
     };
   }
+
+  // Fire WhatsApp notifications (best-effort, never blocks the redirect).
+  // The affiliate gets an interactive button message (Copy link / Open
+  // dashboard); the platform owner gets plain text.
+  const listing = await getListing();
+  const refUrl = `${site.baseUrl}/?ref=${inserted.ref_code}`;
+  const dashboardUrl = `${site.baseUrl}/affiliate/${inserted.ref_code}`;
+  const richWelcome = affiliateWelcomeRich({
+    name: parsed.data.name,
+    refUrl,
+    dashboardUrl,
+    maxCommission: listing.affiliate_commission,
+  });
+  const textFallback = affiliateWelcome({
+    name: parsed.data.name,
+    refUrl,
+    dashboardUrl,
+    maxCommission: listing.affiliate_commission,
+  });
+  const ownerMsg = ownerNewAffiliate({
+    name: parsed.data.name,
+    whatsapp: phone,
+    email,
+    refCode: inserted.ref_code,
+  });
+  await Promise.all([
+    tryWhatsAppButtons(phone, { ...richWelcome, fallbackText: textFallback }),
+    owner.whatsapp ? tryWhatsApp(owner.whatsapp, ownerMsg) : Promise.resolve(),
+  ]);
 
   redirect(`/affiliate/${inserted.ref_code}`);
 }

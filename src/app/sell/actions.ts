@@ -5,6 +5,7 @@ import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase";
 import { normalizePtWhatsapp } from "@/lib/codes";
 import { tryWhatsApp } from "@/lib/whatsapp";
+import { ownerInterestConfirm } from "@/lib/messages";
 import { owner } from "@/lib/config";
 
 const Schema = z.object({
@@ -84,17 +85,25 @@ export async function submitOwnerInterest(
     };
   }
 
-  // Notify platform owner so they can follow up fast while interest is hot.
-  if (owner.whatsapp) {
-    const msg =
-      `🚗 Novo interesse de proprietário\n\n` +
-      `Nome: ${parsed.data.name}\n` +
-      `WhatsApp: +${phone}\n` +
-      (parsed.data.email ? `Email: ${parsed.data.email}\n` : "") +
-      (parsed.data.car_brief ? `Carro: ${parsed.data.car_brief}\n` : "") +
-      (parsed.data.message ? `\nMensagem:\n${parsed.data.message}\n` : "");
-    await tryWhatsApp(owner.whatsapp, msg);
-  }
+  // Two WhatsApp pings: confirmation to the submitter + alert to platform
+  // owner. Best-effort — never blocks the redirect if the API hiccups.
+  const submitterMsg = ownerInterestConfirm({
+    name: parsed.data.name,
+    carBrief: parsed.data.car_brief ?? null,
+  });
+  const platformOwnerMsg =
+    `🚗 Novo interesse de proprietário SaleMyCar\n\n` +
+    `Nome: ${parsed.data.name}\n` +
+    `WhatsApp: +${phone}\n` +
+    (parsed.data.email ? `Email: ${parsed.data.email}\n` : "") +
+    (parsed.data.car_brief ? `Carro: ${parsed.data.car_brief}\n` : "") +
+    (parsed.data.message ? `\nMensagem:\n${parsed.data.message}\n` : "");
+  await Promise.all([
+    tryWhatsApp(phone, submitterMsg),
+    owner.whatsapp
+      ? tryWhatsApp(owner.whatsapp, platformOwnerMsg)
+      : Promise.resolve(),
+  ]);
 
   redirect("/sell/thanks");
 }

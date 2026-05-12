@@ -5,7 +5,9 @@ import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase";
 
 const BUCKET = "salemycar";
-const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+// Capped at 4 MB so we stay inside Next's serverActions body limit
+// (see next.config.ts) and below Vercel's ~4.5 MB infra ceiling.
+const MAX_BYTES = 4 * 1024 * 1024;
 const ALLOWED_MIME = new Set([
   "image/jpeg",
   "image/png",
@@ -135,7 +137,7 @@ export async function uploadPhotos(
   const newUrls: string[] = [];
   for (const file of files) {
     if (file.size > MAX_BYTES) {
-      return { ok: false, error: `"${file.name}" excede 5 MB.` };
+      return { ok: false, error: `"${file.name}" excede 4 MB.` };
     }
     if (file.type && !ALLOWED_MIME.has(file.type)) {
       return { ok: false, error: `"${file.name}" tipo não suportado.` };

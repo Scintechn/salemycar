@@ -39,7 +39,8 @@ export default async function AdminListingPage() {
         <section className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6">
           <h2 className="text-lg font-semibold">Fotos</h2>
           <p className="mt-1 text-sm text-zinc-500">
-            A primeira foto é usada como destaque. Tamanho máx. 5 MB por foto.
+            A primeira foto é usada como destaque. Tamanho máx. 4 MB por foto.
+            Adicione uma de cada vez para evitar limites do servidor.
           </p>
           <PhotoManager photos={listing.photos} />
         </section>

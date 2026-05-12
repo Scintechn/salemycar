@@ -97,7 +97,7 @@ export function PhotoManager({ photos }: { photos: string[] }) {
           htmlFor="photos-input"
           className="cursor-pointer rounded-md border border-dashed border-zinc-300 bg-zinc-50 p-4 text-center text-sm text-zinc-600 hover:bg-zinc-100"
         >
-          Escolher fotos (JPG / PNG / WEBP / HEIC, máx. 5 MB cada)
+          Escolher fotos (JPG / PNG / WEBP / HEIC, máx. 4 MB cada)
           <input
             id="photos-input"
             name="photos"

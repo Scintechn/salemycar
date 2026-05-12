@@ -63,7 +63,7 @@ export function SellForm() {
           htmlFor="own_car"
           hint="(marca, modelo, ano, km — opcional)"
         >
-          Que carro quer vender
+          Que carro quer anunciar
         </Label>
         <Input
           id="own_car"

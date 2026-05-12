@@ -12,7 +12,7 @@ export default function SellPage() {
         </Link>
 
         <h1 className="mt-4 text-2xl font-semibold tracking-tight md:text-3xl">
-          Quer vender o seu carro pela SaleMyCar?
+          Quer anunciar o seu carro na SaleMyCar?
         </h1>
         <p className="mt-3 text-base text-zinc-600">
           De momento operamos com um anúncio de cada vez. Se quiser ser dos

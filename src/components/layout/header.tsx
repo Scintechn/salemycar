@@ -20,7 +20,7 @@ export function Header() {
             href="/sell"
             className="rounded-md bg-zinc-900 px-3 py-1.5 font-medium text-white hover:bg-zinc-800"
           >
-            Vender o meu carro
+            Anunciar o meu carro
           </Link>
         </nav>
       </div>

@@ -120,7 +120,7 @@ export function ownerInterestConfirm(opts: {
 }) {
   const firstName = opts.name.split(/\s+/)[0];
   return (
-    `Olá ${firstName}! Recebemos o seu pedido para vender${opts.carBrief ? ` o ${opts.carBrief}` : " um carro"} pela SaleMyCar.\n\n` +
+    `Olá ${firstName}! Recebemos o seu pedido para anunciar${opts.carBrief ? ` o ${opts.carBrief}` : " um carro"} na SaleMyCar.\n\n` +
     `Vamos contactá-lo brevemente por aqui para conversar sobre o anúncio e os próximos passos. Se preferir, pode também responder a esta mensagem com qualquer dúvida.`
   );
 }

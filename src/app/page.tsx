@@ -1,29 +1,17 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { formatEUR, pricing, priceWithCode } from "@/lib/config";
+import { formatEUR } from "@/lib/config";
+import { getListing, priceWithCode } from "@/lib/listing";
 
-// Hardcoded for the single pilot listing. Refactor when the model is proven.
-const car = {
-  title: "Renault Clio V",
-  year: 2022,
-  km: 38500,
-  fuel: "Gasolina",
-  transmission: "Manual",
-  power: "75 cv",
-  color: "Cinzento Titânio",
-  options: [
-    "Ar condicionado automático",
-    "Sensores de estacionamento traseiros",
-    "Câmara de marcha-atrás",
-    "Apple CarPlay / Android Auto",
-    "Cruise control adaptativo",
-    "Faróis LED",
-    "Jantes em liga leve 16”",
-    "2.º proprietário, livro de revisões na marca",
-  ],
-};
+export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const car = await getListing();
+  const finalPrice = priceWithCode(car);
+
+  const hero = car.photos[0];
+  const gallery = car.photos.slice(1, 5);
+
   return (
     <main className="flex-1">
       {/* ----- HERO ---------------------------------------------------- */}
@@ -31,9 +19,18 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-5xl flex-col gap-10 px-6 py-12 md:flex-row md:items-center md:py-16">
           {/* Image */}
           <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-200 to-zinc-300 md:w-1/2">
-            <div className="flex h-full items-center justify-center text-zinc-500">
-              <span className="text-sm">Foto do Clio</span>
-            </div>
+            {hero ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={hero}
+                alt={`${car.title} ${car.year}`}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center text-zinc-500">
+                <span className="text-sm">Foto em breve</span>
+              </div>
+            )}
           </div>
 
           {/* Copy */}
@@ -44,13 +41,13 @@ export default function HomePage() {
             <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
               {car.title} — {car.year}
             </h1>
-            <p className="mt-3 text-zinc-600">
-              Particular. Sem comissões. Sem intermediários a inflar o preço.
-            </p>
+            {car.description ? (
+              <p className="mt-3 text-zinc-600">{car.description}</p>
+            ) : null}
 
             <div className="mt-6 flex items-baseline gap-3">
               <span className="text-4xl font-bold tracking-tight">
-                {formatEUR(pricing.listPrice)}
+                {formatEUR(car.list_price)}
               </span>
               <span className="text-sm text-zinc-500">preço de tabela</span>
             </div>
@@ -60,11 +57,30 @@ export default function HomePage() {
             </Link>
 
             <p className="mt-3 text-xs text-zinc-500">
-              Com código de desconto: {formatEUR(priceWithCode)}
+              Com código de desconto: {formatEUR(finalPrice)}
             </p>
           </div>
         </div>
       </section>
+
+      {/* Thumbnail strip */}
+      {gallery.length > 0 ? (
+        <section className="bg-white">
+          <div className="mx-auto max-w-5xl px-6 pb-10">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              {gallery.map((src) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={src}
+                  src={src}
+                  alt=""
+                  className="aspect-[4/3] w-full rounded-lg object-cover"
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* ----- BELOW THE FOLD ------------------------------------------ */}
       <section className="bg-zinc-50">
@@ -74,7 +90,7 @@ export default function HomePage() {
               Este anúncio é gerido diretamente pelo proprietário. Se chegou
               aqui através de um link de alguém conhecido, traz consigo um
               código de desconto de{" "}
-              <strong>{formatEUR(pricing.buyerDiscount)}</strong> ao submeter o
+              <strong>{formatEUR(car.buyer_discount)}</strong> ao submeter o
               seu contacto.
             </p>
           </div>
@@ -102,14 +118,18 @@ export default function HomePage() {
 
             <div className="rounded-2xl border border-zinc-200 bg-white p-6">
               <h2 className="text-lg font-semibold">Equipamento</h2>
-              <ul className="mt-4 space-y-2 text-sm text-zinc-700">
-                {car.options.map((opt) => (
-                  <li key={opt} className="flex gap-2">
-                    <span className="text-zinc-400">•</span>
-                    <span>{opt}</span>
-                  </li>
-                ))}
-              </ul>
+              {car.options.length > 0 ? (
+                <ul className="mt-4 space-y-2 text-sm text-zinc-700">
+                  {car.options.map((opt) => (
+                    <li key={opt} className="flex gap-2">
+                      <span className="text-zinc-400">•</span>
+                      <span>{opt}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-4 text-sm text-zinc-500">—</p>
+              )}
             </div>
           </div>
 

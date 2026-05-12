@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { supabaseAdmin, type Affiliate, type Lead } from "@/lib/supabase";
 import { formatEUR, pricing } from "@/lib/config";
+import { getListing } from "@/lib/listing";
 import { LeadRow } from "./lead-row";
 
 export const dynamic = "force-dynamic";
@@ -8,6 +10,7 @@ type AffiliateLite = Pick<Affiliate, "id" | "name" | "ref_code" | "whatsapp">;
 
 export default async function AdminPage() {
   const db = supabaseAdmin();
+  const listing = await getListing();
 
   const [{ data: leadsRaw }, { data: affiliatesRaw }] = await Promise.all([
     db
@@ -61,7 +64,7 @@ export default async function AdminPage() {
               Admin
             </p>
             <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-              Painel do proprietário — Clio V 2022
+              Painel do proprietário — {listing.title} {listing.year}
             </h1>
           </div>
           <div className="flex gap-3 text-sm">
@@ -70,6 +73,22 @@ export default async function AdminPage() {
             <Pill label="A pagar" value={formatEUR(totalOwed)} />
           </div>
         </header>
+
+        <nav className="mt-6 flex gap-3 text-sm">
+          <Link
+            href="/admin/listing"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 font-medium text-zinc-800 hover:bg-zinc-50"
+          >
+            Editar anúncio →
+          </Link>
+          <Link
+            href="/"
+            target="_blank"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-zinc-600 hover:bg-zinc-50"
+          >
+            Ver anúncio público
+          </Link>
+        </nav>
 
         {/* Leads */}
         <section className="mt-10">

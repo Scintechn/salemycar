@@ -12,15 +12,15 @@ export function Header() {
         <nav className="flex items-center gap-2 text-sm">
           <Link
             href="/affiliate"
-            className="rounded-md px-3 py-1.5 font-medium text-zinc-700 hover:bg-zinc-100"
+            className="hidden rounded-md px-3 py-1.5 font-medium text-zinc-700 hover:bg-zinc-100 sm:inline-block"
           >
             Seja Afiliado
           </Link>
           <Link
-            href="/interest"
+            href="/sell"
             className="rounded-md bg-zinc-900 px-3 py-1.5 font-medium text-white hover:bg-zinc-800"
           >
-            Tenho interesse
+            Vender o meu carro
           </Link>
         </nav>
       </div>

@@ -89,8 +89,8 @@ export default async function HomePage() {
                 </span>
               </p>
               <Link href="/interest" className="mt-4 block">
-                <Button size="lg" className="w-full">
-                  Tenho interesse
+                <Button variant="success" size="lg" className="w-full">
+                  Inicie a negociação
                 </Button>
               </Link>
               <p className="mt-3 text-center text-[11px] text-zinc-500">
@@ -182,7 +182,9 @@ export default async function HomePage() {
 
           <div className="mt-10 flex justify-center">
             <Link href="/interest">
-              <Button size="lg">Tenho interesse</Button>
+              <Button variant="success" size="lg">
+                Inicie a negociação
+              </Button>
             </Link>
           </div>
         </div>

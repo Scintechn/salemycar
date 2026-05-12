@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "secondary" | "ghost" | "destructive";
+type Variant = "primary" | "secondary" | "ghost" | "destructive" | "success";
 type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
@@ -11,6 +11,8 @@ const variants: Record<Variant, string> = {
     "bg-white text-zinc-900 ring-1 ring-zinc-300 hover:bg-zinc-50 active:bg-zinc-100",
   ghost: "bg-transparent text-zinc-900 hover:bg-zinc-100",
   destructive: "bg-red-600 text-white hover:bg-red-700",
+  success:
+    "bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 disabled:bg-emerald-300 focus-visible:ring-emerald-700",
 };
 
 const sizes: Record<Size, string> = {

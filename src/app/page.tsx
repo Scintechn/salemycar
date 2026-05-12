@@ -5,20 +5,34 @@ import { getListing, priceWithCode } from "@/lib/listing";
 
 export const dynamic = "force-dynamic";
 
+// Extract the first ~140 chars of the description as a hero tagline.
+// Cut at the first sentence boundary when possible, otherwise word-safe.
+function tagline(desc: string, max = 140): string {
+  if (!desc) return "";
+  const firstChunk = desc.split(/\n\s*\n/)[0].replace(/\s+/g, " ").trim();
+  if (firstChunk.length <= max) return firstChunk;
+  const periodAt = firstChunk.indexOf(". ");
+  if (periodAt > 40 && periodAt <= max) return firstChunk.slice(0, periodAt + 1);
+  const lastSpace = firstChunk.lastIndexOf(" ", max);
+  return firstChunk.slice(0, lastSpace > 0 ? lastSpace : max).trim() + "…";
+}
+
 export default async function HomePage() {
   const car = await getListing();
   const finalPrice = priceWithCode(car);
 
   const hero = car.photos[0];
   const gallery = car.photos.slice(1, 5);
+  const heroTagline = tagline(car.description);
+  const showFullDescription = car.description.trim().length > heroTagline.length;
 
   return (
     <main className="flex-1">
       {/* ----- HERO ---------------------------------------------------- */}
       <section className="border-b border-zinc-200 bg-white">
-        <div className="mx-auto flex max-w-5xl flex-col gap-10 px-6 py-12 md:flex-row md:items-center md:py-16">
+        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 md:grid-cols-[1.1fr_1fr] md:items-center md:py-16">
           {/* Image */}
-          <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-200 to-zinc-300 md:w-1/2">
+          <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-200 to-zinc-300 shadow-sm">
             {hero ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -34,31 +48,55 @@ export default async function HomePage() {
           </div>
 
           {/* Copy */}
-          <div className="md:w-1/2">
-            <p className="text-sm font-medium uppercase tracking-wide text-zinc-500">
+          <div className="flex flex-col">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
               Anúncio particular
             </p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-              {car.title} — {car.year}
+            <h1 className="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight md:text-[2.5rem]">
+              {car.title}
             </h1>
-            {car.description ? (
-              <p className="mt-3 text-zinc-600">{car.description}</p>
+            <p className="mt-1 text-lg text-zinc-500">{car.year}</p>
+
+            {heroTagline ? (
+              <p className="mt-5 text-[15px] leading-relaxed text-zinc-700">
+                {heroTagline}
+              </p>
             ) : null}
 
-            <div className="mt-6 flex items-baseline gap-3">
-              <span className="text-4xl font-bold tracking-tight">
-                {formatEUR(car.list_price)}
-              </span>
-              <span className="text-sm text-zinc-500">preço de tabela</span>
+            {/* Key facts strip */}
+            <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-zinc-700">
+              <KeyFact label="km">{car.km.toLocaleString("pt-PT")}</KeyFact>
+              <KeyFact label="combustível">{car.fuel}</KeyFact>
+              <KeyFact label="caixa">{car.transmission}</KeyFact>
+              <KeyFact label="potência">{car.power}</KeyFact>
+            </ul>
+
+            {/* Price + CTA */}
+            <div className="mt-8 rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="text-3xl font-bold tracking-tight md:text-4xl">
+                  {formatEUR(car.list_price)}
+                </span>
+                <span className="text-xs uppercase tracking-wide text-zinc-500">
+                  preço de tabela
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-emerald-700">
+                Com código de desconto:{" "}
+                <strong>{formatEUR(finalPrice)}</strong>
+                <span className="ml-1 text-zinc-500">
+                  (poupa {formatEUR(car.buyer_discount)})
+                </span>
+              </p>
+              <Link href="/interest" className="mt-4 block">
+                <Button size="lg" className="w-full">
+                  Tenho interesse
+                </Button>
+              </Link>
+              <p className="mt-3 text-center text-[11px] text-zinc-500">
+                Resposta por WhatsApp no próprio dia. Sem intermediários.
+              </p>
             </div>
-
-            <Link href="/interest" className="mt-6 inline-block">
-              <Button size="lg">Tenho interesse</Button>
-            </Link>
-
-            <p className="mt-3 text-xs text-zinc-500">
-              Com código de desconto: {formatEUR(finalPrice)}
-            </p>
           </div>
         </div>
       </section>
@@ -66,7 +104,7 @@ export default async function HomePage() {
       {/* Thumbnail strip */}
       {gallery.length > 0 ? (
         <section className="bg-white">
-          <div className="mx-auto max-w-5xl px-6 pb-10">
+          <div className="mx-auto max-w-6xl px-6 pb-10">
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               {gallery.map((src) => (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -84,7 +122,7 @@ export default async function HomePage() {
 
       {/* ----- BELOW THE FOLD ------------------------------------------ */}
       <section className="bg-zinc-50">
-        <div className="mx-auto max-w-5xl px-6 py-12">
+        <div className="mx-auto max-w-6xl px-6 py-12">
           <div className="rounded-2xl border border-zinc-200 bg-white p-6">
             <p className="text-sm leading-relaxed text-zinc-700">
               Este anúncio é gerido diretamente pelo proprietário. Se chegou
@@ -95,7 +133,16 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
+          {showFullDescription ? (
+            <div className="mt-6 rounded-2xl border border-zinc-200 bg-white p-6">
+              <h2 className="text-lg font-semibold">Sobre este {car.title}</h2>
+              <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-zinc-700">
+                {car.description}
+              </p>
+            </div>
+          ) : null}
+
+          <div className="mt-6 grid gap-6 md:grid-cols-2">
             <div className="rounded-2xl border border-zinc-200 bg-white p-6">
               <h2 className="text-lg font-semibold">Ficha técnica</h2>
               <dl className="mt-4 grid grid-cols-2 gap-y-3 text-sm">
@@ -143,7 +190,7 @@ export default async function HomePage() {
 
       {/* ----- FOOTER -------------------------------------------------- */}
       <footer className="border-t border-zinc-200 bg-white">
-        <div className="mx-auto max-w-5xl px-6 py-6 text-center text-xs text-zinc-500">
+        <div className="mx-auto max-w-6xl px-6 py-6 text-center text-xs text-zinc-500">
           Anúncio particular. Não há comissão para o comprador.{" "}
           <Link href="/affiliate" className="underline hover:text-zinc-700">
             Sou afiliado
@@ -151,5 +198,22 @@ export default async function HomePage() {
         </div>
       </footer>
     </main>
+  );
+}
+
+function KeyFact({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <li className="flex items-baseline gap-1.5">
+      <span className="font-semibold text-zinc-900">{children}</span>
+      <span className="text-xs uppercase tracking-wide text-zinc-500">
+        {label}
+      </span>
+    </li>
   );
 }
